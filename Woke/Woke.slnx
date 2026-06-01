@@ -1,0 +1,8 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="Insomniac.vcxproj" />
+  <Project Path="Woke.vcxproj" Id="e8b561e3-4d66-4269-a4f4-ead8a8c5707c" />
+</Solution>
