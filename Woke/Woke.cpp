@@ -56,7 +56,7 @@ void ParseArguments(int argc, wchar_t* argv[], Options& options)
     }
 }
 static std::atomic<bool> keepRunning{ true };
-HANDLE waitMutex = NULL;
+HANDLE waitEvent = NULL;
 
 
 BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
@@ -69,7 +69,7 @@ BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
     case CTRL_LOGOFF_EVENT:
     case CTRL_SHUTDOWN_EVENT:
         keepRunning = false;
-		SetEvent(waitMutex); // Signal the main thread to exit
+		SetEvent(waitEvent); // Signal the main thread to exit
         return TRUE;
     default:
         return FALSE;
@@ -84,14 +84,14 @@ int wmain(int argc, wchar_t* argv[])
     SetConsoleCtrlHandler(CtrlHandler, TRUE);
     SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_AWAYMODE_REQUIRED);
 
-	waitMutex = CreateEvent(NULL, FALSE, FALSE, NULL);
+    waitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	DWORD waitTime = (runOptions.wakeTime == INDEFINITE_WAKE_TIME) ? INFINITE : runOptions.wakeTime * 1000;
     if(runOptions.verbose)
     {
         std::wcout << L"System will be kept awake for " << (waitTime == INFINITE ? L"indefinitely" : std::to_wstring(waitTime / 1000) + L" seconds") << L". Press Ctrl+C to exit." << std::endl;
 	}
-	WaitForSingleObject(waitMutex, waitTime);
-	CloseHandle(waitMutex); 
+	WaitForSingleObject(waitEvent, waitTime);
+	CloseHandle(waitEvent);
     SetThreadExecutionState(ES_CONTINUOUS);    
 	if (runOptions.verbose)
     {
